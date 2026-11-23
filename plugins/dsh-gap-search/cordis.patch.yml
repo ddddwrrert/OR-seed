@@ -1,0 +1,4 @@
+# Gap search replaces loop, select, mutate, and survive. evaluate stays python-subprocess.
+- insert:
+    - id: gap-search
+      name: dsh-gap-search

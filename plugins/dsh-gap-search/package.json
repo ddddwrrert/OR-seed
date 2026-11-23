@@ -1,0 +1,32 @@
+{
+  "name": "dsh-gap-search",
+  "version": "0.1.0",
+  "description": "ALE-Bench search: each budget unit is spent on the class with the largest total gap and one shared failure. Official fitness stays combined_score.",
+  "license": "MIT",
+  "type": "module",
+  "main": "./src/index.js",
+  "exports": {
+    ".": "./src/index.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "diagnostic",
+    "cordis.patch.yml"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "scripts": {
+    "test": "node --test"
+  },
+  "peerDependencies": {
+    "@deepseek-ai/cordis": "~4.0.4",
+    "@deepseek-ai/dsh-tools": ">=0.1.7-rc.1 <0.2.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
