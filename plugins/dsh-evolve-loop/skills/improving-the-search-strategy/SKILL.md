@@ -53,9 +53,20 @@ A change that bypasses these boundaries has not improved the search; it has inva
 
 ## ALE-Bench gap search
 
-On an ALE-Bench task the mounted plugin `dsh-gap-search` already replaces `loop`, `select`, `mutate`, and `survive`. Leave `evaluate` on `python-subprocess`. Do not register another provider over those four slots, and do not remove `seed_profile` from the evaluator return. `combined_score` is still the only official fitness, and `best_id` is still the candidate with the best official merit.
+On an ALE-Bench task, `dsh-gap-search` is the starting strategy, in the same sense that the default loop is the starting strategy on every other task. It spends each budget unit on a class of public cases that share a large unclaimed gap, so the fifty-case mean is not the only signal the search follows. You still improve this strategy during the run. Between chunks, diagnose from `run/gap/log.jsonl`, the per-candidate profiles, and the population, then revise the search with `evolve_define` and `evolve_activate` when the evidence supports a change.
 
-Each budget unit is one mechanism for the class with the largest total gap and one shared failure. The writing parent changes only when that class's mean δ and the measured execution time both pass. A stop reason of `no-recoverable-gap` means no class remains; leave the remaining budget unspent.
+Leave `evaluate` on `python-subprocess`. Keep `seed_profile` on the evaluator return. `combined_score` is still the only official fitness, and `best_id` is still the candidate with the best official merit.
+
+A revision keeps these rules:
+
+- Each budget unit carries one mechanism name for one class: the same failure, at least three cases, and a positive total gap. A rejected name is removed from that class and is not issued again for it.
+- The writing parent changes only when that class's mean δ and the measured execution time both pass. A survival-no row is not brought back.
+- Official fitness is recorded for every evaluated candidate, including one whose edit was rejected.
+- A stop reason of `no-recoverable-gap` means no class remains. Leave the remaining budget unspent.
+
+A revision may change the worker context, which alive candidate the next class is taken from, survival and memory, and the loop itself. The active `select`, `mutate`, and `survive` are the ones the gap loop calls, so a later registration is what runs on the next chunk. A replacement `mutate` receives `{ parent, assignment, prompt }`, allocates once, and starts one worker. A replacement `loop` still produces each new candidate through one gap assignment, one `allocate`, one worker, the official evaluator, and `judge`.
+
+`evolve.gap` exposes `decide`, `pick`, `dropMechanism`, `timeDirection`, `buildPrompt`, `judge`, and `persona` for that replacement. Text you add for the worker must keep the assignment's mechanism, feature, and clock, and must not tell the program to branch on a public case number. Lessons you want the next attempt to see can also be written to `run/gap/lessons.md`; the starting loop appends that file to the assignment prompt.
 
 Non-ALE-Bench tasks still use the original five providers. The fixed boundaries above still hold, including the rule that an already recorded fitness is the official score of the code that was evaluated.
 

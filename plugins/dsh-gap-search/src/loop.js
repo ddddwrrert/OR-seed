@@ -22,7 +22,8 @@ export const name = 'gap-search'
 
 /**
  * ALE-Bench spends each budget unit on one class and one mechanism.
- * Every other task uses the original loop, select, mutate, and survive.
+ * select, mutate, and survive are the active providers, so a strategy registered
+ * later in the run is the one that runs. Every other task uses the original loop.
  * @param {object} args
  * @param {object} evolve
  */
@@ -94,7 +95,12 @@ async function aleRun(evolve) {
       direction,
       officialFitness: parentRow?.fitness,
     }
-    const candidate = await evolve.mutate({ parent: parentId, assignment, prompt: buildPrompt(assignment) })
+    let prompt = buildPrompt(assignment)
+    const lessons = await files.read('gap/lessons.md')
+    if (typeof lessons === 'string' && lessons.trim() !== '') {
+      prompt = `${prompt}\n\nLessons carried from earlier attempts:\n${lessons.trim()}\n`
+    }
+    const candidate = await evolve.mutate({ parent: parentId, assignment, prompt })
     created += 1
     const fitness = await evolve.evaluate(candidate)
     let childProfile

@@ -175,6 +175,29 @@ test('no writable class spends no budget unit', async () => {
   }
 })
 
+test('a later mutate receives the gap assignment and any carried lessons', async () => {
+  const { task, root } = await makeTask(true)
+  const hooks = { spawned: 0, evaluated: [], rise: true, improve: true }
+  const evolve = host(task, root, hooks)
+  const seen = []
+  evolve.mutate = async options => {
+    seen.push({ mechanism: options.assignment?.mechanism, prompt: options.prompt })
+    const candidate = await evolve.allocate(options.parent)
+    await writeFile(join(candidate.dir, 'solution.cpp'), CHILD)
+    return candidate
+  }
+  try {
+    await filesOf(root).write('gap/lessons.md', 'Keep the heavier search inside the same feature cut.\n')
+    await run({}, evolve)
+    assert.equal(seen.length, 1)
+    assert.equal(seen[0].mechanism, 'heavier-search')
+    assert.match(seen[0].prompt, /Keep the heavier search inside the same feature cut/)
+    assert.equal(hooks.spawned, 0)
+  } finally {
+    await rm(task, { recursive: true, force: true })
+  }
+})
+
 test('a non ALE-Bench task uses the original loop and does not spawn a gap worker', async () => {
   const { task, root } = await makeTask(false)
   const hooks = { spawned: 0, evaluated: [] }

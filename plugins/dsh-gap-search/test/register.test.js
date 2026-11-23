@@ -17,4 +17,7 @@ test('the plugin replaces four slots and leaves evaluate alone', () => {
   }
   apply(ctx)
   assert.deepEqual(slots, ['loop', 'select', 'mutate', 'survive'])
+  assert.deepEqual(Object.keys(ctx.evolve.gap).sort(), [
+    'buildPrompt', 'decide', 'dropMechanism', 'judge', 'persona', 'pick', 'timeDirection',
+  ])
 })

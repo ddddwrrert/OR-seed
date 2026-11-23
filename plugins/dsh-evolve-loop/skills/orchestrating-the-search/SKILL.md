@@ -20,9 +20,9 @@ The initial policy is simple:
 
 select → mutate → evaluate → record → survive → repeat
 
-On an ALE-Bench task that policy is already replaced by `dsh-gap-search`. Run `evolve_run` and read `run/gap/`. Do not put the original roulette loop back, and do not spend budget by hand. The number you report is still `combined_score`. A result that says `no-recoverable-gap` is finished: the remaining budget stays unspent.
+On an ALE-Bench task the starting policy is `dsh-gap-search`: each new candidate is one mechanism for the class with the largest unclaimed gap. Run `evolve_run` in chunks, then read `run/population.jsonl` and `run/gap/`. When a chunk shows a recurring weakness in how classes are attempted, how workers are instructed, or how lessons are carried, load `improving-the-search-strategy` and revise the strategy. The number you report is still `combined_score`. A result that says `no-recoverable-gap` is finished: the remaining budget stays unspent.
 
-On every other task the policy below is the starting point. EVOLVE may change how candidates are selected, produced, compared, or managed as the search progresses.
+On every other task the policy below is the starting point. On every task, EVOLVE may change how candidates are selected, produced, compared, or managed as the search progresses. An ALE-Bench revision keeps the gap assignment, δ, and the official `combined_score`.
 
 Some rules are fixed, however: the task and evaluator must remain untouched, official fitness must come from the official evaluator, and a candidate must never change after its score has been recorded.
 
